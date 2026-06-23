@@ -13,7 +13,7 @@ using namespace std;
 struct Task { 
     string id;  //task id
     int burst;  //total cpu time cyc req by tasks
-    int r;    //raining burst time req to complete  
+    int r;    //remaining burst time req to complete  
     vector<string> mem; //list of memory addresses
     int mp=0; //mem pointer 
     int at; //arrival time of task
