@@ -7,7 +7,6 @@
 #include <unordered_set>
 #include <string>
 #include <algorithm>
-
 using namespace std;
 
 struct Task { 
@@ -20,7 +19,6 @@ struct Task {
 
     Task(string i, int b, vector<string> m, int a): id(i), burst(b), r(b), mem(m), at(a) {}
 }; //constructor
-
 
 class cache {  //fifo caache block
     size_t cap;  //capacity= no. of block cache can hold
@@ -47,10 +45,8 @@ public:
         q.push_back(x);  //pushes the new element at the back of queue
         s.insert(x);  //register it in hash set
         return ev;  //returns evicted item
-
-
-
     }
+    
 void remove(const string& x) { //removes memory block x from cache
     if (!s.count(x))
         return; //return if block not present
@@ -72,8 +68,6 @@ void remove(const string& x) { //removes memory block x from cache
     }
 };
 
-
-
 class mems {    //allocates capacity of l1, l2,l3
 public:
     cache l1,l2,l3;  //3 level cache sys
@@ -87,42 +81,42 @@ void seed(vector<string> a, vector<string> b, vector<string> c) {  //inserting i
     }
 void acc(const string& x) { //simulating a mem access request for x
     if (l1.has(x)) {  //if data is found in l1=fastest access
-        cout << " -> HIT L1";
-        lat += 4; //lowest latency for l1 hit
+        cout<<" -> HIT L1";
+        lat+=4; //lowest latency for l1 hit
         return;
     }
     cout << " >> MISS L1";
 
-    if (l2.has(x)) {  //if not in l1 but found in l2
-        cout << " >> Hit L2";
-        lat += 12; //latency for l2 hit
-        return;
-    }
+    if (l2.has(x)) { //if not in l1 but found in l2
+    cout<<" >> Hit L2";
+    lat+=12;  //latency for l2 hit
+    l2.remove(x);  //remove block from l2
+    string ev=l1.add(x);  //promote block to l1
+
+    if (!ev.empty())  //check if l1 eviction occurred
+        cout<<" (evicted "<<ev<<")"; 
+    return; //stop further searching    
+}
     cout << " >> MISS L2";
-    if (l3.has(x)) {
-    cout << " >> Hit L3";
-    lat += 40; //latency for l3 hit
-    l3.remove(x); //remove data from l3
-    l2.add(x); //move data from l3 to l2
-    string ev = l1.add(x); //move data from l2 to l1
-    l2.remove(x); //remove data from l2 after promoting to l1
-    if (!ev.empty())
-        cout << " (evicted " << ev << ")"; //if l1 full; oldest data is evicted
-    return;
+
+    if (l3.has(x)) {  //checkin if block is in l3
+    cout<<" >> Hit L3";
+    lat+=40; //latency for l3 hit
+   l3.remove(x); //remove block from l3
+string ev=l2.add(x);  //promote block to l2
+
+if (!ev.empty()) //checkin if l2 eviction occurred
+    cout<<" (evicted "<<ev<<")";
+return; //stop further searching
 }
 
-    cout << " >> Miss L3 >> RAM"; //if not found in cache go to ram
+    cout<<" >> Miss L3 >> RAM"; //if not found in cache go to ram
 ram++; //increase ram access count
-lat += 200; //highest latency for accessing ram
-l3.add(x); //copy data from ram to l3
-l2.add(x); //copy data from l3 to l2
-
-string ev = l1.add(x); //copy data from l2 to l1
-l3.remove(x); //remove data from l3 after promotion
-l2.remove(x); //remove data from l2 after promotion
+lat+=200; //highest latency for accessing ram
+string ev=l3.add(x);
 
 if (!ev.empty())
-    cout << " (evicted " << ev << ")"; //check if l1 eviction possible
+    cout<<" (evicted "<<ev<<")";
 }
     void show() const { //displaying current contents of all cache levels
         l1.print("L1"); 
@@ -211,7 +205,7 @@ int slice = min(qt, cur.r);  //task runs for quantum or remaining burst time
 
             if (!cur.mem.empty()) {
                 string b = cur.mem[cur.mp % cur.mem.size()]; //accessing mem blocks in cyclic order
-                cout <<"Requesting"<< b;
+                cout <<"Requesting: "<< b;
                 mem.acc(b);  
                 cur.mp++;  //move to next mem reference
             } else {
